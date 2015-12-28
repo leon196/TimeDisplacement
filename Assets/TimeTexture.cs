@@ -8,10 +8,13 @@ public class TimeTexture : MonoBehaviour
 	Color[][] colorList;
 	int width, height, sliceCount;
 	int userSliceCount = 2;
+	bool direction = false;
+	bool flipH = false;
+	bool flipV = true;
 
 	GUIText helpText;
 	string helpText1 = "Time Displacement with Unity3D by Leon\nCode sources : github.com/leon196/TimeDisplacement\n\nSlices size : ";
-	string helpText2 = "\nLEFT and RIGHT to set time slices size\n\nF1 or H to toggle this message\nESCAPE to quit";
+	string helpText2 = "\nLEFT and RIGHT to set time slices size\n\nD to change direction\nV to flip webcam vertically\nH to flip webcam horizontally\n\nF1 or X to toggle this message\nESCAPE to quit";
 
 	void SetupWebcam ()
 	{
@@ -55,17 +58,13 @@ public class TimeTexture : MonoBehaviour
 		SetupTimeTexture();
 		helpText = GameObject.FindObjectOfType<GUIText>();
 		UpdateHelpText();
+		Shader.SetGlobalFloat("_Vertical", flipV ? 1f : 0f);
+		Shader.SetGlobalFloat("_Horizontal", flipH ? 1f : 0f);
 	}
 
 	void Update ()
 	{
-		if (Input.GetKeyDown(KeyCode.Escape)) {
-			Application.Quit();
-		}
-
-		if (Input.GetKeyDown(KeyCode.H) || Input.GetKeyDown(KeyCode.F1)) {
-			helpText.enabled = !helpText.enabled;
-		}
+		UpdateInputs();
 
 		if (webcamTexture)
 		{
@@ -81,7 +80,13 @@ public class TimeTexture : MonoBehaviour
 			// Map colors into one texture
 			Color[] newColors = new Color[webcamColors.Length];
 			for (int c = 0; c < webcamColors.Length; ++c) {
-				float ratio = c / (float)webcamColors.Length;
+				float ratio;
+				if (direction) {
+					ratio = (webcamColors.Length - c - 1) / (float)webcamColors.Length;
+				}
+				else {
+					ratio = c / (float)webcamColors.Length;
+				}
 				int index = (int)Mathf.Floor(ratio * sliceCount);
 				newColors[c] = colorList[index][c];
 			}
@@ -118,5 +123,30 @@ public class TimeTexture : MonoBehaviour
 	void UpdateHelpText ()
 	{
 		helpText.text = helpText1 + userSliceCount + helpText2;
+	}
+
+	void UpdateInputs ()
+	{
+		if (Input.GetKeyDown(KeyCode.Escape)) {
+			Application.Quit();
+		}
+
+		if (Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.F1)) {
+			helpText.enabled = !helpText.enabled;
+		}
+
+		if (Input.GetKeyDown(KeyCode.V)) {
+			flipV = !flipV;
+			Shader.SetGlobalFloat("_Vertical", flipV ? 1f : 0f);
+		}
+
+		if (Input.GetKeyDown(KeyCode.H)) {
+			flipH = !flipH;
+			Shader.SetGlobalFloat("_Horizontal", flipH ? 1f : 0f);
+		}
+
+		if (Input.GetKeyDown(KeyCode.D)) {
+			direction = !direction;
+		}
 	}
 }
