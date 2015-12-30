@@ -8,6 +8,7 @@ public class UserParameter : MonoBehaviour
 	[HideInInspector] public bool direction = false;
 	[HideInInspector] public bool flipH = false;
 	[HideInInspector] public bool flipV = true;
+	[HideInInspector] public bool mode = true;
 	TimeDisplacement timeDisplacement;
 	HelpText helpText;
 
@@ -15,6 +16,9 @@ public class UserParameter : MonoBehaviour
 	{
 		helpText = GameObject.FindObjectOfType<HelpText>();
 		timeDisplacement = GameObject.FindObjectOfType<TimeDisplacement>();
+		Shader.SetGlobalFloat("_Mode", mode ? 1f : 0f);
+		Shader.SetGlobalFloat("_Vertical", flipV ? 1f : 0f);
+		Shader.SetGlobalFloat("_Horizontal", flipH ? 1f : 0f);
 		UpdateParameters();
 	}
 
@@ -24,18 +28,24 @@ public class UserParameter : MonoBehaviour
 			Application.Quit();
 		}
 
+		if (Input.GetKeyDown(KeyCode.Space)) {
+			mode = !mode;
+			Shader.SetGlobalFloat("_Mode", mode ? 1f : 0f);
+		}
+
 		if (Input.GetKeyDown(KeyCode.V)) {
 			flipV = !flipV;
-			UpdateParameters();
+			Shader.SetGlobalFloat("_Vertical", flipV ? 1f : 0f);
 		}
 
 		if (Input.GetKeyDown(KeyCode.H)) {
 			flipH = !flipH;
-			UpdateParameters();
+			Shader.SetGlobalFloat("_Horizontal", flipH ? 1f : 0f);
 		}
 
 		if (Input.GetKeyDown(KeyCode.D)) {
 			direction = !direction;
+			timeDisplacement.direction = direction;
 		}
 
 		if (Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.F1)) {
@@ -55,11 +65,9 @@ public class UserParameter : MonoBehaviour
 
 	void UpdateParameters ()
 	{
-		Shader.SetGlobalFloat("_Vertical", flipV ? 1f : 0f);
-		Shader.SetGlobalFloat("_Horizontal", flipH ? 1f : 0f);
 		sliceCount = (int)Screen.height / sliceSize;
-		timeDisplacement.direction = direction;
 		timeDisplacement.ResizeSlices(sliceCount);
 		helpText.sliceSize = sliceSize;
+		helpText.UpdateHelpText();
 	}
 }

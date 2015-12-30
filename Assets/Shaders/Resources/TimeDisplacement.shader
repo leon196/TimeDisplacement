@@ -28,15 +28,17 @@ Shader "Hidden/TimeDisplacement" {
 			}
 			
 			sampler2D _MainTex;
+			sampler2D _SlitTexture;
 			sampler2D _TimeTexture;
 			float _Horizontal;
 			float _Vertical;
+			float _Mode;
 
 			fixed4 frag (v2f i) : SV_Target {
 				float2 uv = i.uv;
 				uv.x = lerp(uv.x, 1.0 - uv.x, step(0.5, _Horizontal));
 				uv.y = lerp(uv.y, 1.0 - uv.y, step(0.5, _Vertical));
-				return tex2D(_TimeTexture, uv);
+				return lerp(tex2D(_SlitTexture, uv), tex2D(_TimeTexture, uv), step(0.5, _Mode));
 			}
 			ENDCG
 		}
