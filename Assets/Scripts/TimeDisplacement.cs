@@ -43,6 +43,8 @@ public class TimeDisplacement : MonoBehaviour
 				colorList[i] = colorList[i - 1];
 			}
 
+			// SuffleArray(colorList);
+
 			// Refresh first color list
 			Color[] webcamColors = webcam.texture.GetPixels();
 			colorList[0] = webcamColors;
@@ -80,5 +82,17 @@ public class TimeDisplacement : MonoBehaviour
 				colorList[i] = color;
 			}
 		}
+	}
+
+	Color[][] SuffleArray (Color[][] array)
+	{
+	 for (int i = array.Length - 1; i > 0; i--)
+	 {
+	     int j = (int)Mathf.Floor(Random.Range(0f, 1f) * (i + 1));
+	     Color[] temp = array[i];
+	     array[i] = array[j];
+	     array[j] = temp;
+	 }
+	 return array;
 	}
 }
