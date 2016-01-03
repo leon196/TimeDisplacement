@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Time Displacement</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+	<p id="errorMessage"></p>
+	<video id="monitor" autoplay="autoplay" height="800" width="600"></video>
+	<canvas id="videoImage" width="800" height="600"></canvas>
+
+	<div id="ThreeJS"></div>
+
+	<script src="js/lib/three.js"></script>
+	<script src="js/lib/THREEx.js"></script>
+	<script src="js/lib/THREEx_002.js"></script>
+	<script src="js/lib/THREEx_003.js"></script>
+	<script src="js/webcam.js"></script>
+
+	<script type="x-shader/x-vertex" id="vertexShader">  
+		varying vec2 vUv;
+		void main() {
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+		}
+	</script>
+
+	<script type="x-shader/x-fragment" id="fragmentShader">  
+		varying vec2 vUv;
+		uniform vec2 uResolution;
+		uniform sampler2D uTexture;
+		void main() {  
+			vec2 uv = gl_FragCoord.xy / uResolution;
+			vec4 color = texture2D(uTexture, uv);
+			gl_FragColor = color;
+		}
+	</script>  
+
+	<script src="js/main.js"></script>
+
+</body>
+</html>
